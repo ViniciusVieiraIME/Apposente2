@@ -1,0 +1,9 @@
+#set( $updateList = {} )
+#foreach( $entry in $ctx.args.updateTransactionAutoupdateLogInput.keySet() )
+  #set( $discard = $updateList.put($entry, "'$ctx.args.updateTransactionAutoupdateLogInput[$entry]'") )
+#end
+#set( $update = $updateList.toString().replace("{","").replace("}","") )
+{
+  "version": "2018-05-29",
+  "statements":   ["UPDATE transactionAutoupdateLog SET $update WHERE trasactionAutoupdateLogID=$ctx.args.updateTransactionAutoupdateLogInput.trasactionAutoupdateLogID", "SELECT * FROM transactionAutoupdateLog WHERE trasactionAutoupdateLogID=$ctx.args.updateTransactionAutoupdateLogInput.trasactionAutoupdateLogID"]
+}

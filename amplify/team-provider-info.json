@@ -1,0 +1,29 @@
+{
+    "dev": {
+        "awscloudformation": {
+            "AuthRoleName": "amplify-apposente-dev-160934-authRole",
+            "UnauthRoleArn": "arn:aws:iam::216109444394:role/amplify-apposente-dev-160934-unauthRole",
+            "AuthRoleArn": "arn:aws:iam::216109444394:role/amplify-apposente-dev-160934-authRole",
+            "Region": "us-east-1",
+            "DeploymentBucketName": "amplify-apposente-dev-160934-deployment",
+            "UnauthRoleName": "amplify-apposente-dev-160934-unauthRole",
+            "StackName": "amplify-apposente-dev-160934",
+            "StackId": "arn:aws:cloudformation:us-east-1:216109444394:stack/amplify-apposente-dev-160934/5c94e2f0-e186-11ea-a896-0eb57e33ee85",
+            "AmplifyAppId": "d2in91v0i4iwyd"
+        },
+        "categories": {
+            "api": {
+                "apposente": {
+                    "rdsRegion": "us-east-1",
+                    "rdsClusterIdentifier": "arn:aws:rds:us-east-1:216109444394:cluster:cei-dev",
+                    "rdsSecretStoreArn": "arn:aws:secretsmanager:us-east-1:216109444394:secret:rds-db-credentials/cluster-YYYAS5A42EIMLWRPYI3XSIOOPE/admin-RRZ61g",
+                    "rdsDatabaseName": "CEI"
+                }
+            },
+            "auth": {
+                "apposenteb08b292e": {},
+                "apposente522e21ae": {}
+            }
+        }
+    }
+}
