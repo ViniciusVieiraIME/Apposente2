@@ -19,7 +19,7 @@
 		}
 	},
 	"auth": {
-		"apposente522e21ae": {
+		"apposente91d77811": {
 			"service": "Cognito",
 			"providerPlugin": "awscloudformation",
 			"dependsOn": [],
