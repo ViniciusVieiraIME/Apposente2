@@ -1,10 +1,10 @@
-import React from 'react'
+import React, {useState} from 'react'
 import { Dimensions, StyleSheet, TextInput } from 'react-native'
 
 const { width } = Dimensions.get('window')
 
 const Input = ({
-  placeholder, type, secureTextEntry = false, onChangeText
+  placeholder, type, secureTextEntry = false, onChangeText, onEndEditing
 }) => (
   <TextInput
     style={styles.input}
@@ -12,6 +12,7 @@ const Input = ({
     autoCapitalize='none'
     autoCorrect={false}
     onChangeText={v => onChangeText(type, v)}
+    onEndEditing={v => onEndEditing(v.nativeEvent.text)}
     secureTextEntry={secureTextEntry}
     placeholderTextColor='#e2a45b'
     selectionColor={'#e2a45b'}
@@ -24,7 +25,7 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     height: 45,
     width: width - 20,
-    marginBottom: 10,
+    marginTop: 10,
     fontSize: 16,
     paddingHorizontal: 14,
     fontFamily: 'SourceSansPro-Regular',

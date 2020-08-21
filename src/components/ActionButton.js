@@ -20,12 +20,13 @@ const ActionButton = ({
 const styles = StyleSheet.create({
   buttonContainer: {
     backgroundColor: '#ffb100',
-    borderRadius: 25
+    borderRadius: 25,
+    marginTop: 10,
   },
   button: {
     height: 50,
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   buttonText: {
     color: 'white',
