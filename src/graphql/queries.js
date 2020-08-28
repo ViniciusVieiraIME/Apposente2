@@ -334,9 +334,9 @@ export const getUsers = /* GraphQL */ `
     }
   }
 `;
-export const listUserss = /* GraphQL */ `
-  query ListUserss {
-    listUserss {
+export const getUsersByEmail = /* GraphQL */ `
+  query GetUsersByEmail($email: String!) {
+    getUsersByEmail(email: $email) {
       userid
       cpf
       email
@@ -347,32 +347,16 @@ export const listUserss = /* GraphQL */ `
     }
   }
 `;
-export const getTodo = /* GraphQL */ `
-  query GetTodo($id: ID!) {
-    getTodo(id: $id) {
-      id
+export const listUserss = /* GraphQL */ `
+  query ListUserss {
+    listUserss {
+      userid
+      cpf
+      email
+      password
+      creationtime
       name
-      description
-      createdAt
-      updatedAt
-    }
-  }
-`;
-export const listTodos = /* GraphQL */ `
-  query ListTodos(
-    $filter: ModelTodoFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    listTodos(filter: $filter, limit: $limit, nextToken: $nextToken) {
-      items {
-        id
-        name
-        description
-        createdAt
-        updatedAt
-      }
-      nextToken
+      lastcrawltime
     }
   }
 `;

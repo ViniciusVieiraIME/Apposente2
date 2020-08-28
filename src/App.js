@@ -4,7 +4,7 @@ import Auth from './nav/auth/Auth'
 import Initializing from './nav/Initializing'
 import MainNav from './nav/main/MainNav'
 
-import { Auth as AmplifyAuth } from 'aws-amplify'
+import { Auth as AmplifyAuth, API } from 'aws-amplify'
 
 class App extends React.Component {
   state = {

@@ -91,10 +91,28 @@ Parameters:
               
   userPoolGroupList:
     Type: CommaDelimitedList
-                          
+              
   dependsOn:
     Type: CommaDelimitedList
-    
+        
+  userPoolGroups:
+    Type: String
+              
+  adminQueries:
+    Type: String
+            
+  triggers:
+    Type: String
+                
+  hostedUI:
+    Type: String
+                  
+  parentStack:
+    Type: String
+                
+  permissions:
+    Type: CommaDelimitedList
+                
 Conditions:
   ShouldNotCreateEnvResources: !Equals [ !Ref env, NONE ]
 
@@ -171,6 +189,18 @@ Resources:
         SnsCallerArn: !GetAtt SNSRole.Arn
         ExternalId: appose8e77257d_role_external_id
     
+  
+    
+    
+  
+    
+    
+  
+  
+   
+    
+  # Updating lambda role with permissions to Cognito
+  
   
   UserPoolClientWeb:
   # Created provide application access to user pool
@@ -309,7 +339,7 @@ Resources:
   # Always created
     Type: AWS::Cognito::IdentityPool
     Properties: 
-      IdentityPoolName: !If [ShouldNotCreateEnvResources, 'apposente8e77257d_identitypool_8e77257d', !Join ['',['apposente8e77257d_identitypool_8e77257d', '__', !Ref env]]]
+      IdentityPoolName: !If [ShouldNotCreateEnvResources, 'apposente8e77257d_identitypool_123a124a', !Join ['',['apposente8e77257d_identitypool_123a124a', '__', !Ref env]]]
       
       CognitoIdentityProviders:
         - ClientId:  !Ref UserPoolClient

@@ -4,7 +4,7 @@ import { Dimensions, StyleSheet, TextInput } from 'react-native'
 const { width } = Dimensions.get('window')
 
 const Input = ({
-  placeholder, type, secureTextEntry = false, onChangeText, onEndEditing
+  placeholder, type, secureTextEntry = false, onChangeText, onEndEditing, text, value
 }) => (
   <TextInput
     style={styles.input}
@@ -16,6 +16,8 @@ const Input = ({
     secureTextEntry={secureTextEntry}
     placeholderTextColor='#e2a45b'
     selectionColor={'#e2a45b'}
+    text={text}
+    value={value}
   />
 )
 

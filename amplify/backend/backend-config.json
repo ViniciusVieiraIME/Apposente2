@@ -25,5 +25,22 @@
 			"dependsOn": [],
 			"customAuth": false
 		}
+	},
+	"function": {
+		"apposente1851b6cb": {
+			"build": true,
+			"providerPlugin": "awscloudformation",
+			"service": "Lambda",
+			"dependsOn": [
+				{
+					"category": "api",
+					"resourceName": "lambdaapi",
+					"attributes": [
+						"ApiName",
+						"ApiId"
+					]
+				}
+			]
+		}
 	}
 }

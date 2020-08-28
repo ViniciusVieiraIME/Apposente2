@@ -17,6 +17,7 @@ import useColorScheme from './hooks/useColorScheme';
 
 Amplify.configure(config)
 
+
 function AppWithNavigationContainer() {
   const isLoadingComplete = useCachedResources();
   const colorScheme = useColorScheme();

@@ -1,5 +1,5 @@
 {
-    "identityPoolName": "apposente8e77257d_identitypool_8e77257d",
+    "identityPoolName": "apposente8e77257d_identitypool_123a124a",
     "allowUnauthenticatedIdentities": false,
     "resourceNameTruncated": "appose8e77257d",
     "userPoolName": "apposente8e77257d_userpool_8e77257d",
@@ -50,5 +50,13 @@
         "email"
     ],
     "userPoolGroupList": [],
-    "dependsOn": []
+    "dependsOn": [],
+    "userPoolGroups": false,
+    "adminQueries": false,
+    "triggers": "{}",
+    "hostedUI": false,
+    "parentStack": {
+        "Ref": "AWS::StackId"
+    },
+    "permissions": []
 }

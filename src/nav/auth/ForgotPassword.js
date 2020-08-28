@@ -66,7 +66,8 @@ class ForgotPassword extends React.Component {
         if(password.length>=6){
           await Auth.forgotPasswordSubmit(username, auth, password)
           console.log('successfully changed password!')
-          this.props.toggleAuthType('showSignIn')
+          await Auth.signIn(username, password)
+          this.props.updateAuth('MainNav')
         } else {
           console.log('Tamanho do e-mail inválido')
           this.setState({ is_valid_cei_pwd: false})

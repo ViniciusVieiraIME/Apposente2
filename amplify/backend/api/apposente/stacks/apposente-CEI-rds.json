@@ -25,19 +25,23 @@
     },
     "rdsRegion": {
       "Type": "String",
-      "Description": "The region that the RDS Cluster is located in."
+      "Description": "The region that the RDS Cluster is located in.",
+      "Default": "us-east-1"
     },
     "rdsClusterIdentifier": {
       "Type": "String",
-      "Description": "The ARN identifier denoting the RDS cluster."
+      "Description": "The ARN identifier denoting the RDS cluster.",
+      "Default": "NONE"
     },
     "rdsSecretStoreArn": {
       "Type": "String",
-      "Description": "The ARN for the Secret containing the access for the RDS cluster."
+      "Description": "The ARN for the Secret containing the access for the RDS cluster.",
+      "Default": "NONE"
     },
     "rdsDatabaseName": {
       "Type": "String",
-      "Description": "The name of the database within the RDS cluster to use."
+      "Description": "The name of the database within the RDS cluster to use.",
+      "Default": "NONE"
     }
   },
   "Resources": {

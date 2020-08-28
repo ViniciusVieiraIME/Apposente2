@@ -1,6 +1,6 @@
 projects:
   apposente:
-    schemaPath: src/graphql/schema.json
+    schemaPath: amplify/backend/api/apposente/build/schema.graphql
     includes:
       - src/graphql/**/*.js
     excludes:
