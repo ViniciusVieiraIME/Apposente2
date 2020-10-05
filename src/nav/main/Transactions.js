@@ -1,23 +1,20 @@
 import React from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 
-import { Auth } from 'aws-amplify'
-
-class Home extends React.Component {
+class Route2 extends React.Component {
   static navigationOptions = {
-    title: 'Home'
+    title: 'Route 2'
   }
-
   render() {
-    console.log('props: ', this.props)
     return (
       <View style={styles.container}>
-        <Text>Hello from Home</Text>
-        <Text onPress={() => this.props.navigation.navigate('Carteira')} style={styles.link}>Carteira</Text>
+        <Text>Hello from Route 2</Text>
+        <Text onPress={() => this.props.navigation.goBack()}>Go Back</Text>
       </View>
     )
   }
 }
+
 
 const styles = StyleSheet.create({
   container: {
@@ -25,11 +22,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'white'
-  },
-  link: {
-    color: 'blue',
-    marginVertical: 5
   }
 })
 
-export default Home
+export default Route2

@@ -46,7 +46,12 @@ class Auth extends React.Component {
               updateAuth={() => this.props.updateAuth('mainNav')}
             />
           ) }
-          { showForgotPassword && <ForgotPassword toggleAuthType={this.toggleAuthType} /> }
+          { showForgotPassword && ( 
+            <ForgotPassword 
+              toggleAuthType={this.toggleAuthType} 
+              updateAuth={() => this.props.updateAuth('mainNav')} 
+            /> 
+            ) }
           <View style={{ position: 'absolute', bottom: 40 }}>
             {
               showSignUp || showForgotPassword ? (

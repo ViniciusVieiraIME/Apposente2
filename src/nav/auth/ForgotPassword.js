@@ -16,7 +16,9 @@ class ForgotPassword extends React.Component {
     is_valid_email: true,
     is_valid_cei_pwd: true,
     non_existing_user: true,
-    is_correct_code: true
+    is_correct_code: true,
+    could_resend_code: true,
+    limit_exceeded_exception: false
   }
   onChangeText = (key, value) => {
     this.setState({ [key]: value })
@@ -47,6 +49,8 @@ class ForgotPassword extends React.Component {
     try {
       if( username.length >=8){
         await Auth.forgotPassword(this.state.username)
+        this.setState({ 'is_valid_email': true})
+        this.setState({ 'limit_exceeded_exception': false})
         this.setState({ stage: 1 })
       } else {
         console.log('Tamanho do e-mail inválido')
@@ -55,8 +59,8 @@ class ForgotPassword extends React.Component {
     } 
     catch(err){
       console.log('error: ', err)
+      err.code == "LimitExceededException" ? this.setState({ 'limit_exceeded_exception': true }) : this.setState({ 'is_valid_email': false})
       console.log('E-mail incorreto')
-      this.setState({ 'is_valid_email': false})
     }
   }
   confirmResetPassword = async () => {
@@ -64,7 +68,7 @@ class ForgotPassword extends React.Component {
     try{
       if(authCode.length==6){
         if(password.length>=6){
-          await Auth.forgotPasswordSubmit(username, auth, password)
+          await Auth.forgotPasswordSubmit(username, authCode, password)
           console.log('successfully changed password!')
           await Auth.signIn(username, password)
           this.props.updateAuth('MainNav')
@@ -74,10 +78,12 @@ class ForgotPassword extends React.Component {
         }
       } else {
         console.log('Código incorreto')
+        console.log(authCode)
         this.setState({ is_correct_code: false})
       }
     }
     catch(err) {
+      console.log('error: ', err)
       console.log('error resetting password:', err)
       this.setState({ is_valid_cei_pwd: false})
       this.setState({ is_correct_code: false})
@@ -88,7 +94,10 @@ class ForgotPassword extends React.Component {
     try {
       await Auth.resendSignUp(username)
     } catch (err) {
+      console.log('error: ', err)
       console.log('error resending the password')
+      console.log(err)
+      this.setState({ could_resend_code: false})
     }
   }
   render() {
@@ -103,13 +112,18 @@ class ForgotPassword extends React.Component {
               type='username'
               placeholder='e-mail'
             />
+            { this.state.limit_exceeded_exception ?
+              <Animatable.View animation="fadeInLeft" duration={500}>
+                <Text style={styles.errMsg}>e-mail inválido</Text>
+              </Animatable.View> : null 
+            }
             { this.state.is_valid_email ? null :
               <Animatable.View animation="fadeInLeft" duration={500}>
                 <Text style={styles.errMsg}>e-mail inválido</Text>
               </Animatable.View>
             }
             <ActionButton
-              title='Resetar senha'
+              title='Obter nova senha'
               onPress={this.resetPassword}
             />
           </View>
@@ -119,7 +133,7 @@ class ForgotPassword extends React.Component {
             <Input
               onChangeText={this.onChangeText}
               onEndEditing={this.handleValidCode}
-              type='authorizationCode'
+              type='authCode'
               placeholder='Código de Confirmação'
             />
             { this.state.is_correct_code ? null :
@@ -144,10 +158,15 @@ class ForgotPassword extends React.Component {
               onPress={this.confirmResetPassword}
             />
             <View style={styles.buttonContainer}>
-                <TouchableHighlight onPress={this.resendCode}>
-                  <Text>Reenviar Código de Confirmação</Text>
-                </TouchableHighlight>
-              </View>
+              <TouchableHighlight onPress={this.resendCode}>
+                <Text>Reenviar Código de Confirmação</Text>
+              </TouchableHighlight>
+            </View>
+            { this.state.could_resend_code ? null :
+              <Animatable.View animation="fadeInLeft" duration={500}>
+                <Text style={styles.errMsg}>Limite de reenvios atingido, tente novamente mais tarde.</Text>
+              </Animatable.View>
+            }
           </View>
         )}
       </View>

@@ -1,8 +1,10 @@
 import React, { Fragment, Component, useEffect, useState } from 'react'
-import { View, StyleSheet, TouchableHighlight, Text, Linking } from 'react-native'
+import { View, StyleSheet, TouchableHighlight, Text, Linking, FlatList } from 'react-native'
 import { Auth, API } from 'aws-amplify'
 import { validate } from 'gerador-validador-cpf'
 import * as Animatable from 'react-native-animatable'
+
+import { Col, Row, Grid } from "react-native-easy-grid";
 
 import { Input, ActionButton } from '../../components'
 
@@ -22,8 +24,20 @@ class SignIn extends Component {
     is_correct_code: true,
     is_loading_position: true,
     is_loading_transactions: true,
-    res: []
+    res: [],
+    curPos: [],
+    curPosID: '',
+    brokerName: '',
+    stockCode: '',
+    qty: '',
+    data: '',
+    avgPrice: '',
+    posToTrans: [],
+    transactions: [],
+    performance: []
   }
+  apipath = 'https://nv91wgawqd.execute-api.us-east-1.amazonaws.com/default/'
+
 
   onChangeText = (key, value) => {
       this.setState({ [key]: value })
@@ -58,7 +72,7 @@ class SignIn extends Component {
     }
   }
   handleValidCode = (value) => {
-    if(value.length<6){
+    if(value.length<5){
       this.setState({ ['is_correct_code']: false})
     } else {
       this.setState({ ['is_correct_code']: true}) 
@@ -73,7 +87,6 @@ class SignIn extends Component {
     const {
       username, password, cpf, cei_pwd, is_valid_cpf, is_loading, res
     } = this.state
-    const apipath = 'https://nv91wgawqd.execute-api.us-east-1.amazonaws.com/default/'
     
     try {
       if(cei_pwd.length>=6){
@@ -82,12 +95,12 @@ class SignIn extends Component {
             if(validate(cpf)) {
               await Auth.signUp({ username, password, 'custom:cpf': String(cpf).replace(/\.|-|\s/g, ''), 'custom:cei_pwd': cei_pwd})
               console.log('successful sign up..')
-              fetch(apipath + 'CEI_CurrentPosition?userid=0&cpf=' + cpf + '&pwd=' + cei_pwd + '&email=' + username)
+              fetch(this.apipath + 'CEI_CurrentPosition?userid=0&cpf=' + cpf + '&pwd=' + cei_pwd + '&email=' + username)
                   .then((response) => response.json())
                   .then ((responseJson) => this.setState({ ['res']: responseJson }))
                   .catch((error) => console.error(error))
                   .finally(() => this.setState({ ['is_loading_position']: false }))
-              fetch(apipath + 'SLayer?userid=0&cpf=' + cpf + '&pwd=' + cei_pwd + '&email=' + username)
+              fetch(this.apipath + 'SLayer?userid=0&cpf=' + cpf + '&pwd=' + cei_pwd + '&email=' + username)
                   .then((response) => response.json())
                   .then ((responseJson) => this.setState({ ['res']: responseJson }))
                   .catch((error) => console.error(error))
@@ -170,20 +183,63 @@ class SignIn extends Component {
       console.log('error resending the password')
     }
   }
-  getCurrentPosition = async () => {
-    // consultar posição atual na carteira
+
+  getCurrentPosition = async (userid) =>{
+    const response = await fetch(this.apipath + 'getAPI?method=CurrentPosition&userid=' + userid);
+    const json = await response.json();
+    console.log(json);
+    this.setState({ ['curPos']: json })
   }
 
-  getTransactions = async () =>{
-
+  setCurrentPosition = async (userid, curPosID, brokerName, stockCode, qty) =>{
+    const response = await fetch(this.apipath + 'getAPI?method=setCurrentPosition&userid=' + userid + '&curPosID=' + curPosID + '&brokerName=' + brokerName + '&stockCode=' + stockCode + '&qty=' + qty);
+    const json = await response.json();
+    console.log(json);
+    this.setState({ ['curPos']: json })
   }
 
   comparePositionToTransactions = async () =>{
+    try {
+      const response = await fetch(this.apipath + 'CEI_getAPI?method=PositionToTransactions&userid=' + userid)
+      const json = await response.json();
+      console.log(json);
+      this.setState({ posToTrans: json })
+    }
+    catch (err) {
+      console.log('error signing in...', err)
+    }
+  }
 
+  getTransactions = async () =>{
+    try {
+      this.setState({ res: await fetch(this.apipath + 'CEI_getAPI?method=Transactions&userid=' + userid)})
+      const response = await fetch(this.apipath + 'CEI_getAPI?method=Transactions&userid=' + userid)
+      const json = await response.json();
+      console.log(json);
+      this.setState({ transactions: json })
+    }
+    catch (err) {
+      console.log('error signing in...', err)
+    }
+  }
+
+  setTransaction = async (userid, brokerName, stockCode, qty, price) =>{
+    const response = await fetch(this.apipath + 'getAPI?method=setTransaction&userid=' + userid + '&brokerName=' + brokerName + '&stockCode=' + stockCode + '&qty=' + qty + '&price=' + price );
+    const json = await response.json();
+    console.log(json);
+    this.setState({ ['curPos']: json })
   }
 
   getPerformance = async () =>{
-
+    try {
+      const response = await fetch(this.apipath + 'CEI_getAPI?method=Performance&userid=' + userid);
+      const json = await response.json();
+      console.log(json);
+      this.setState({ ['performance']: json })
+    }
+    catch (err) {
+      console.log('error signing in...', err)
+    }
   }
 
   render() {
@@ -283,8 +339,8 @@ class SignIn extends Component {
               <Text></Text>
               <Text>Assim que terminarmos verificaremos juntos se está correta e faremos o mesmo para suas transações.</Text>
               <Text></Text>
-              <Text>Fique tranquilo que isso apenas será necessário no primeiro acesso, uma vez configurado terá acesso a todas as informações automaticamente</Text>
-              {!this.state.is_loading_position && this.setState({ stage: 3 })}   
+              <Text>Esse processo levará alguns minutos, uma vez configurado a atualização é automática.</Text>
+              {!this.state.is_loading_position && this.getCurrentPosition() && this.setState({ stage: 3 })}   
             </Fragment>
           )
         }
@@ -294,9 +350,51 @@ class SignIn extends Component {
               <Text>Verifique se a carteira que carregamos do CEI está correta.</Text>
               <Text></Text>
               <Text>Note que o CEI não disponibiliza sua posição em derivativos e termo, caso tenha opções, subscrições ou termos em carteira precisará inserir manualmente.</Text>
-              <Text>-----Exibir carteira carregada com a quantidade agrupada por ativo e corretora </Text>
-              <TouchableHighlight onPress={this.setState({ stage: 4 })}>
-                  <Text>Editar carteira</Text>
+              <Row size={2}>
+                <Col size={2} style={{alignItems: 'center'}}>
+                  <Text>Corretora</Text>
+                </Col>
+                <Col size={1} style={{alignItems: 'center'}}>
+                  <Text>Ativo</Text>
+                </Col>
+                <Col size={1} style={{alignItems: 'center'}}>
+                  <Text>Posição</Text>
+                </Col>
+              </Row> 
+              <FlatList
+                data={this.state.curPos}
+                keyExtractor={(x, i) => i}
+                renderItem={({ item }) => 
+                  <Row>
+                    <Col size={2} style={{alignItems: 'center'}}>
+                      <Text>{item.brokername}</Text>
+                    </Col>
+                    <Col size={1} style={{alignItems: 'center'}}>
+                      <Text>{item.stockcode}</Text>
+                    </Col>
+                    <Col size={1} style={{alignItems: 'center'}}>
+                      {
+                        (item.edited?(
+                        <TouchableHighlight onPress={
+                          this.setState({ curPosID: item.currentpositionid }),
+                          this.setState({ brokerName: item.brokername }),
+                          this.setState({ stockCode: item.stockcode }),
+                          this.setState({ qty: item.qty }),
+                          this.setState({ stage: 4 })
+                        }>
+                          <Text style={{fontWeight: 'bold'}}>{item.qtd}</Text>
+                        </TouchableHighlight>)
+                        :<Text>{item.qtd}</Text>)
+                    }
+                    </Col>
+                  </Row>}
+              />
+              <TouchableHighlight onPress={
+                  this.setState({ curPosID: '' }),
+                  this.setState({ stockCode: '' }),
+                  this.setState({ qty: '' }),
+                  this.setState({ stage: 4 })}>
+                <Text>Adicionar Posição na Carteira</Text>
               </TouchableHighlight>
                <ActionButton
                 title='Carteira Correta'
@@ -308,9 +406,32 @@ class SignIn extends Component {
         { // Tela de edição de carteira
           this.state.stage === Number(4) && (
             <Fragment>
+              <Input
+                placeholder='Corretora'
+                type='broker'
+                //onEndEditing={this.handleValidBroker}
+                value={this.state.brokerName}
+              />
+              <Input
+                placeholder='Código do Ativo'
+                type='stockcode'
+                //onEndEditing={this.handleValidStockCode}
+                value={this.state.stockCode}
+              />
+              <Input
+                placeholder='Quantidade'
+                type='qty'
+                //onEndEditing={this.handleValidQty}
+                value={this.state.qty}
+              />
+              <View style={styles.buttonContainer}>
+                <TouchableHighlight onPress={this.setState({ stage: 4 })}>
+                  <Text>Voltar</Text>
+                </TouchableHighlight>
+              </View>
               <ActionButton
-                title='Edição concluída'
-                onPress={this.setState({ stage: 4 })}
+                title='Salvar'
+                onPress={this.setCurrentPosition(this.state.userid, this.state.curPosID, this.state.brokerName, this.state.stockCode, this.state.qty) && this.setState({ stage: 4 })}
               />
             </Fragment>
           )
@@ -320,6 +441,9 @@ class SignIn extends Component {
             <Fragment>
               <Text>Agora falta apenas checarmos suas transações e estaremos prontos.</Text>
               <Text>A carga terminará em instantes.</Text>
+              <TouchableHighlight onPress={this.setState({ stage: 3 })}>
+                  <Text>Voltar para edição da carteira</Text>
+              </TouchableHighlight>
               {!this.state.is_loading_position && this.setState({ stage: 6 })}  
             </Fragment>
           )
@@ -327,14 +451,83 @@ class SignIn extends Component {
         { // Tela de confirmação de transações
           this.state.stage === Number(6) && (
             <Fragment>
-              <Text>Comparando a carteira que confirmou com as transações que carregamos percebemos as diferenças abaixo.</Text>
-              <Text>Para o cálculo de impostos correto basta inserir os preços médios de cada ação exibida abaixo e sua rentabilidade será exibida apenas a partir de 18 meses atrás.</Text>
-              <Text>----- Exibir transações divergentes -------</Text>
-              <Text>Se sua intenção é monitorar sua rentabilidade de forma mais detalhada precisaremos que insira cada transação anterior a 18 meses de forma manual. Pode fazer isso diretamente no aplicativo</Text>
-              <Text>As transações que conseguimos carregar do CEI são:</Text>
-              <Text>----- Exibir todas as transações agrupadas por data, ativo e corretora -------</Text>
-              <TouchableHighlight onPress={this.setState({ stage: 7 })}>
-                  <Text>Editar transações</Text>
+              <Text>A carga de transações do CEI possui algumas limitações, para o cálculo de seu preço médio verifique os casos abaixo.</Text>
+              <Row size={2}>
+                <Col size={2} style={{alignItems: 'center'}}>
+                  <Text>Corretora</Text>
+                </Col>
+                <Col size={1} style={{alignItems: 'center'}}>
+                  <Text>Ativo</Text>
+                </Col>
+                <Col size={1} style={{alignItems: 'center'}}>
+                  <Text>Posição</Text>
+                </Col>
+              </Row>              
+              <FlatList
+                data={this.state.posToTrans}
+                keyExtractor={(x, i) => i}
+                renderItem={({ item }) => 
+                  <Row size={1}>
+                    <Col size={2} style={{alignItems: 'center'}}>
+                      <Text>{item.brokername}</Text>
+                    </Col>
+                    <Col size={1} style={{alignItems: 'center'}}>
+                      <Text>{item.stockcode}</Text>
+                    </Col>
+                    <Col size={1} style={{alignItems: 'center'}}>
+                      <TouchableHighlight onPress={
+                        this.setState({ brokerName: item.brokername }),
+                        this.setState({ stockCode: item.stockcode }),
+                        this.setState({ qty: item.qty }),
+                        this.setState({ avgPrice: item.avgprice}),
+                        this.setState({ stage: 7 })}>
+                        <Text style={{fontWeight: 'bold'}}>{item.qtd}</Text>
+                      </TouchableHighlight>
+                    </Col>
+                  </Row>}
+              />
+              <Text>Conseguimos carregar essas transações:</Text>
+              <Row size={2}>
+                <Col size={2} style={{alignItems: 'center'}}>
+                  <Text>Corretora</Text>
+                </Col>
+                <Col size={2} style={{alignItems: 'center'}}>
+                  <Text>Data</Text>
+                </Col>
+                <Col size={1} style={{alignItems: 'center'}}>
+                  <Text>Ativo</Text>
+                </Col>
+                <Col size={1} style={{alignItems: 'center'}}>
+                  <Text>Posição</Text>
+                </Col>
+              </Row>              
+              <FlatList
+                data={this.state.posToTrans}
+                keyExtractor={(x, i) => i}
+                renderItem={({ item }) => 
+                  <Row size={1}>
+                    <Col size={2} style={{alignItems: 'center'}}>
+                      <Text>{item.brokername}</Text>
+                    </Col>
+                    <Col size={1} style={{alignItems: 'center'}}>
+                      <Text>{item.data}</Text>
+                    </Col>
+                    <Col size={1} style={{alignItems: 'center'}}>
+                      <Text>{item.stockcode}</Text>
+                    </Col>
+                    <Col size={1} style={{alignItems: 'center'}}>
+                      <Text>{item.qtd}</Text>
+                    </Col>
+                  </Row>}/>
+              <TouchableHighlight onPress={this.setState({ stage: 3 })}>
+                  <Text>Voltar para sua carteira</Text>
+              </TouchableHighlight>
+              <TouchableHighlight onPress={
+                        this.setState({ stockCode: '' }),
+                        this.setState({ qty: '' }),
+                        this.setState({ avgPrice: ''}),
+                        this.setState({ stage: 7 })}>
+                  <Text>Nova transação</Text>
               </TouchableHighlight>
               <ActionButton
                 title='Transações Corretas'
@@ -343,12 +536,41 @@ class SignIn extends Component {
             </Fragment>
           )
         }
-        { // Tela de edição de carteira
+        { // Tela de edição de transações
           this.state.stage === Number(7) && (
             <Fragment>
+              <Input
+                placeholder='Corretora'
+                type='broker'
+                //onEndEditing={this.handleValidBroker}
+                value={this.state.brokerName}
+              />
+              <Input
+                placeholder='Código do Ativo'
+                type='stockcode'
+                //onEndEditing={this.handleValidStockCode}
+                value={this.state.stockCode}
+              />
+              <Input
+                placeholder='Quantidade'
+                type='qty'
+                //onEndEditing={this.handleValidQty}
+                value={this.state.qty}
+              />
+              <Input
+                placeholder='Preço'
+                type='price'
+                //onEndEditing={this.handleValidQty}
+                value={this.state.avgPrice}
+              />
+              <View style={styles.buttonContainer}>
+                <TouchableHighlight onPress={this.setState({ stage: 6 })}>
+                  <Text>Voltar</Text>
+                </TouchableHighlight>
+              </View>
               <ActionButton
-                title='Edição concluída'
-                onPress={this.setState({ stage: 6 })}
+                title='Salvar'
+                onPress={this.setTransaction(this.state.userid, this.state.brokerName, this.state.stockCode, this.state.qty, this.state.price) && this.setState({ stage: 8 })}
               />
             </Fragment>
           )
@@ -356,10 +578,48 @@ class SignIn extends Component {
         { // Tela final de confirmação de carteira
           this.state.stage === Number(8) && (
             <Fragment>
-              <Text>Pronto! Sua carteira com preços médios e rentabilidade atual está abaixo</Text>
-              <Text>----- Exibir todos os ativos da carteira com (quantidade ou valor total?), preço médio, cotação atual e rentabilidade(cotação atual/preço médio) -------</Text>
-              <TouchableHighlight onPress={this.setState({ stage: 7 })}>
-                  <Text>Editar transações</Text>
+              <Text>Pronto! Se estiver tudo certo seja bem vindo.</Text>
+              <Row size={2}>
+                <Col size={1} style={{alignItems: 'center'}}>
+                  <Text>Ativo</Text>
+                </Col>
+                <Col size={1} style={{alignItems: 'center'}}>
+                  <Text>Posição</Text>
+                </Col>
+                <Col size={1} style={{alignItems: 'center'}}>
+                  <Text>Pç. Médio</Text>
+                </Col>
+                <Col size={1} style={{alignItems: 'center'}}>
+                  <Text>Pç. Mercado</Text>
+                </Col>
+                <Col size={1} style={{alignItems: 'center'}}>
+                  <Text>Rent.</Text>
+                </Col>
+              </Row>
+              <FlatList
+                data={this.state.performance}
+                keyExtractor={(x, i) => i}
+                renderItem={({ item }) => 
+                  <Row size={1}>
+                    <Col size={1} style={{alignItems: 'center'}}>
+                      <Text>{item.stockcode}</Text>
+                    </Col>
+                    <Col size={1} style={{alignItems: 'center'}}>
+                      <Text>{item.position}</Text>
+                    </Col>
+                    <Col size={1} style={{alignItems: 'center'}}>
+                      <Text>{item.avgPrice}</Text>
+                    </Col>
+                    <Col size={1} style={{alignItems: 'center'}}>
+                      <Text>{item.closingPrice}</Text>
+                    </Col>
+                    <Col size={1} style={{alignItems: 'center'}}>
+                      <Text>{item.profitabily}</Text>
+                    </Col>
+                  </Row>}
+              />
+              <TouchableHighlight onPress={this.setState({ stage: 6 })}>
+                  <Text>Voltar para transações</Text>
               </TouchableHighlight>
               <ActionButton
                 title='Tudo Certo!'
