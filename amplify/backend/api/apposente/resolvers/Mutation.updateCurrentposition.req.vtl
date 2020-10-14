@@ -1,9 +1,0 @@
-#set( $updateList = {} )
-#foreach( $entry in $ctx.args.updateCurrentpositionInput.keySet() )
-  #set( $discard = $updateList.put($entry, "'$ctx.args.updateCurrentpositionInput[$entry]'") )
-#end
-#set( $update = $updateList.toString().replace("{","").replace("}","") )
-{
-  "version": "2018-05-29",
-  "statements":   ["UPDATE currentposition SET $update WHERE currentpositionid=$ctx.args.updateCurrentpositionInput.currentpositionid", "SELECT * FROM currentposition WHERE currentpositionid=$ctx.args.updateCurrentpositionInput.currentpositionid"]
-}

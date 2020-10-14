@@ -1,9 +1,9 @@
 import React from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 
-class Route2 extends React.Component {
+class Portfolio extends React.Component {
   static navigationOptions = {
-    title: 'Route 2'
+    title: 'Portfolio'
   }
   render() {
     return (
@@ -25,4 +25,4 @@ const styles = StyleSheet.create({
   }
 })
 
-export default Route2
+export default Portfolio

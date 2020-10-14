@@ -1,6 +1,6 @@
 import React, { Fragment, Component, useEffect, useState } from 'react'
 import { View, StyleSheet, TouchableHighlight, Text, Linking, FlatList } from 'react-native'
-import { Auth, API } from 'aws-amplify'
+import { Auth } from 'aws-amplify'
 import { validate } from 'gerador-validador-cpf'
 import * as Animatable from 'react-native-animatable'
 

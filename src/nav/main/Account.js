@@ -37,4 +37,4 @@ const styles = StyleSheet.create({
   }
 })
 
-export default Route2
+export default Account

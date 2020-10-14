@@ -1,7 +1,5 @@
 import React from 'react'
-import {
-  View, Text, StyleSheet, Image, Dimensions, TouchableHighlight
-} from 'react-native'
+import { View, Text, StyleSheet, Image, Dimensions, TouchableHighlight } from 'react-native'
 import { Input, ActionButton } from '../../components'
 import * as Animatable from 'react-native-animatable'
 import { Auth } from 'aws-amplify'

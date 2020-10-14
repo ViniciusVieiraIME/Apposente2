@@ -1,23 +1,5 @@
 {
-	"api": {
-		"apposente": {
-			"service": "AppSync",
-			"providerPlugin": "awscloudformation",
-			"output": {
-				"authConfig": {
-					"defaultAuthentication": {
-						"authenticationType": "API_KEY",
-						"apiKeyConfig": {
-							"apiKeyExpirationDays": 365,
-							"description": ""
-						}
-					},
-					"additionalAuthenticationProviders": []
-				}
-			},
-			"rdsInit": true
-		}
-	},
+	"api": {},
 	"auth": {
 		"apposente8e77257d": {
 			"service": "Cognito",

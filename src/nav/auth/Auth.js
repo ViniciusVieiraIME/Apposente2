@@ -1,7 +1,5 @@
 import React from 'react'
-import {
-  View, Text, StyleSheet, Image, Dimensions, KeyboardAvoidingView, Platform
-} from 'react-native'
+import { View, Text, StyleSheet, Image, Dimensions, KeyboardAvoidingView, Platform } from 'react-native'
 
 import SignIn from './SignIn'
 import SignUp from './SignUp'

@@ -1,9 +1,0 @@
-#set( $updateList = {} )
-#foreach( $entry in $ctx.args.updateAvgPriceTInput.keySet() )
-  #set( $discard = $updateList.put($entry, "'$ctx.args.updateAvgPriceTInput[$entry]'") )
-#end
-#set( $update = $updateList.toString().replace("{","").replace("}","") )
-{
-  "version": "2018-05-29",
-  "statements":   ["UPDATE avgPriceT SET $update WHERE avgPriceID=$ctx.args.updateAvgPriceTInput.avgPriceID", "SELECT * FROM avgPriceT WHERE avgPriceID=$ctx.args.updateAvgPriceTInput.avgPriceID"]
-}
